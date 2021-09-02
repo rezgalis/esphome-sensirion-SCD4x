@@ -1,5 +1,5 @@
-# esphome-sensirion-SCD4x
-Script &amp; config to enable in ESPHome SCD4x CO2 sensor by Sensirion
+# HA esphome-sensirion-SCD4x
+Script &amp; config to enable in Home Assistant ESPHome SCD4x CO2 sensor by Sensirion
 
 ## Setup steps:
 1. Copy script `scd41_sensor.h` into `/config/esphome/`
