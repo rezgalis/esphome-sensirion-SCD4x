@@ -1,0 +1,91 @@
+esphome:
+  name: d1-scd41
+  platform: ESP8266
+  board: d1_mini
+  includes:
+    - scd41_sensor.h
+  libraries:
+    - "Sensirion Core"
+    - "Sensirion I2C SCD4x"
+
+# Enable logging
+logger:
+
+web_server:
+  port: 80
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "CHANGEME"
+
+wifi:
+  ssid: "CHANGEME"
+  password: "CHANGEME"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "D1-Scd41 Fallback Hotspot"
+    password: "CHANGEME"
+
+captive_portal:
+
+light:
+  - platform: fastled_clockless
+    chipset: WS2811
+    pin: D3
+    num_leds: 1
+    rgb_order: GRB
+    name: "FastLED WS2811 Light"
+    id: rgb_led
+
+
+sensor:
+- platform: custom
+  lambda: |-
+    auto scd41 = new scd41_sensor();
+    App.register_component(scd41);
+    return {scd41->temperature_sensor, scd41->humidity_sensor, scd41->co2_sensor};
+
+  sensors:
+  - name: "SCD41 Temperature"
+    unit_of_measurement: °C
+    accuracy_decimals: 2
+  - name: "SCD41 Humidity"
+    unit_of_measurement: '%'
+    accuracy_decimals: 0
+  - name: "SCD41 CO2"
+    unit_of_measurement: ppm
+    accuracy_decimals: 0
+    on_value_range:
+      - above: 1500
+        below: 5000
+        then:
+          - light.turn_off: 
+             id: rgb_led
+          - light.turn_on: 
+             id: rgb_led
+             red: 100%
+             blue: 0%
+             green: 0%
+      - above: 1000
+        below: 1500
+        then:
+          - light.turn_off: 
+             id: rgb_led
+          - light.turn_on: 
+             id: rgb_led
+             red: 100%
+             blue: 0%
+             green: 75%
+      - above: 200
+        below: 1000
+        then:
+          - light.turn_off: 
+             id: rgb_led
+          - light.turn_on: 
+             id: rgb_led
+             red: 0%
+             blue: 0%
+             green: 100%
